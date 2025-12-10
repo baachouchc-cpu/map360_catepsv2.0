@@ -60,7 +60,6 @@ if (autorotateToggleElement) {
 }
 
 // Gestión de Escenas y Hostpots
-
 // Variables globales
 let allScenes = [];
 let cachedScenes = new Map(); // Cache de escenas ya creadas
