@@ -14,7 +14,7 @@ const sidebar = document.getElementById('sidebar');
 const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
 const API_BASE = "https://webservice-map360.onrender.com";
-const API_WEATHER_BASE = "http://api.openweathermap.org/data/2.5/weather";
+const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
 // Obtener el parámetro 'id' de la URL
 const urlParams = new URLSearchParams(window.location.search);
 const sceneIdFromUrl = urlParams.get('id'); // esto devuelve "10" si la URL es ?id=10
