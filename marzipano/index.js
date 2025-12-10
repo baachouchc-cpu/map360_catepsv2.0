@@ -13,7 +13,7 @@ const sceneListElement = document.getElementById("sceneList");
 const sidebar = document.getElementById('sidebar');
 const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = "https://webservice-map360.onrender.com/";
 const API_WEATHER_BASE = "http://api.openweathermap.org/data/2.5/weather";
 // Obtener el parámetro 'id' de la URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -328,9 +328,27 @@ async function loadScene(scene, retryCount = 0) {
             return weatherData;
           }
 
+          function fechaFormateada() {
+            const fecha = new Date();
+
+            const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+            const diaSemana = dias[fecha.getDay()];
+            const dia = fecha.getDate();
+            const mes = meses[fecha.getMonth()];
+            const año = fecha.getFullYear();
+
+            const horas = String(fecha.getHours()).padStart(2, "0");
+            const minutos = String(fecha.getMinutes()).padStart(2, "0");
+
+            return `${diaSemana}, ${dia} ${mes} ${año} ${horas}:${minutos}`;
+          }
+
           fetchWeather().then(weather => {
             // Puedes usar los datos del clima aquí
-            const weatherInfo = `Clima en ${weather.name}: ${weather.weather[0].description} <br> Temperatura: ${weather.main.temp}°C <br> Humedad: ${weather.main.humidity}%`;
+            const weatherInfo = `${fechaFormateada()} <br> Clima en ${weather.name}: ${weather.weather[0].description} <br> Temperatura: ${weather.main.temp}°C <br> Humedad: ${weather.main.humidity}%`;
             const descBox = document.createElement("div");
             descBox.classList.add("textInfo");
             
