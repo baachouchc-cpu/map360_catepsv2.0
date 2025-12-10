@@ -36,7 +36,6 @@ const autorotate = Marzipano.autorotate({
 const autorotateEnabled = false;
 
 // Si quieres un botón de toggle, asegúrate de tener uno en el HTML con id="autorotateToggle"
-// <button id="autorotateToggle">⟳ Autorotate</button>
 
 const autorotateToggleElement = document.getElementById('autorotateToggle');
 
