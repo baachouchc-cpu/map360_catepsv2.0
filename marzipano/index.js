@@ -347,15 +347,26 @@ async function loadScene(scene, retryCount = 0) {
           }
 
           fetchWeather().then(weather => {
+
             // Puedes usar los datos del clima aquí
             const weatherInfo = `${fechaFormateada()} <br> Clima en ${weather.name}: ${weather.weather[0].description} <br> Temperatura: ${weather.main.temp}°C <br> Humedad: ${weather.main.humidity}%`;
             const descBox = document.createElement("div");
             descBox.classList.add("textInfo");
             
           // hotspot
+            // const hotspot = document.createElement("div");
+            // hotspot.classList.add("hotspot");
+            // hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
+            // descBox.appendChild(hotspot);
             const hotspot = document.createElement("div");
-            hotspot.classList.add("hotspot");
-            hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
+            hotspot.classList.add("reveal");
+
+            const icon = document.createElement('img');
+            icon.src = r.icon_url && r.icon_url.trim() !== "" 
+              ? r.icon_url 
+              : "https://cdn-icons-png.flaticon.com/512/684/684908.png";
+            //icon.classList.add('hotspot-icon');
+            hotspot.appendChild(icon);
             descBox.appendChild(hotspot);
 
             // tooltip
