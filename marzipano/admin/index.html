@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Administracion</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<form id="interactionForm">
+
+  <h2>Crear / Actualizar interacción</h2>
+
+  <input type="hidden" id="id_interactions">
+
+  <label>Scene ID</label>
+  <input type="number" id="scene_id" required>
+
+  <label>Título</label>
+  <input type="text" id="title" required>
+
+  <label>Yaw</label>
+  <input type="number" step="any" id="yaw" required>
+
+  <label>Pitch</label>
+  <input type="number" step="any" id="pitch" required>
+
+  <label>Descripción</label>
+  <textarea id="description"></textarea>
+
+  <label>Link</label>
+  <input type="text" id="link">
+
+  <label>Icon ID</label>
+  <input type="number" id="icon_id">
+
+  <label>Rotación</label>
+  <input type="number" step="any" id="rotation" required>
+
+  <label>Radio</label>
+  <input type="number" id="radius">
+
+  <label>Type ID</label>
+  <input type="number" id="type_id" required>
+
+  <button type="submit">Guardar</button>
+</form>
+
+<script src="interactions.js"></script>
+</body>
+</html>
