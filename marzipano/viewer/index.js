@@ -13,8 +13,10 @@ const sceneListElement = document.getElementById("sceneList");
 const sidebar = document.getElementById('sidebar');
 const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
-//const API_BASE = "https://webservice-map360.onrender.com";
-const API_BASE = "http://127.0.0.1:5000";
+const API_BASE = window.location.hostname === "localhost"
+  ? "http://127.0.0.1:5000"
+  : "https://webservice-map360.onrender.com";
+//const API_BASE = "http://127.0.0.1:5000";
 const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
 // Obtener el parámetro 'id' de la URL
 const urlParams = new URLSearchParams(window.location.search);
