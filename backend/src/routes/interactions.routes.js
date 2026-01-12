@@ -1,12 +1,21 @@
-const express = require("express");
+// src/routes/interactions.routes.js
+const express = require("express"); 
 const router = express.Router();
 const {
-  upsertInteraction
+  upsertInteraction,
+  getInteractionById
 } = require("../controllers/interactions.controller");
 
-// POST o PUT → UPSERT
+// GET → obtener 1 interacción
+router.get("/:id", getInteractionById);
+
+// POST → crear
 router.post("/", upsertInteraction);
-// opcional REST puro
-router.put("/", upsertInteraction);
+
+// PUT → actualizar
+router.put("/:id", (req, res) => {
+  req.body.id_interactions = req.params.id;
+  upsertInteraction(req, res);
+});
 
 module.exports = router;

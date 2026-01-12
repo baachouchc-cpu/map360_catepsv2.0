@@ -1,5 +1,7 @@
 const Interactions = require("../models/interactions.model");
+const db = require("../services/db");
 
+// CREATE + UPDATE (UPSERT)
 const upsertInteraction = async (req, res) => {
   try {
     const {
@@ -40,6 +42,31 @@ const upsertInteraction = async (req, res) => {
   }
 };
 
+
+// GET BY ID
+const getInteractionById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { rows } = await db.query(
+      "SELECT * FROM interactions WHERE id_interactions = $1",
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Interacción no encontrada" });
+    }
+
+    res.json(rows[0]);
+
+  } catch (error) {
+    console.error("GET interaction error:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+};
+
+
 module.exports = {
-  upsertInteraction
+  upsertInteraction,
+  getInteractionById
 };

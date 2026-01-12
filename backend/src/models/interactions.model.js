@@ -1,4 +1,4 @@
-// src/models/interactions.model.js
+// src/models/interactions.model.js  
 const pool = require("../services/db");
 
 const Interactions = {

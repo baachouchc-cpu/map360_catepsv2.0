@@ -114,3 +114,17 @@ button:active {
     max-width: 100%;
   }
 }
+
+.logout {
+  background: #d9534f;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.logout:hover {
+  background: #c9302c;
+}

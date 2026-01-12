@@ -417,7 +417,18 @@ async function loadScene(scene, retryCount = 0) {
         } else {
           createdScene.hotspotContainer().createHotspot(wrapper, pos);
         }
+
+        // guardar referencia por si luego la necesitas
+        interactionsMap[r.id_interaction] = wrapper;
+
+        // doble click
+        wrapper.addEventListener("dblclick", () => {
+          const url = `/admin/login?id_interaction=${r.id_interactions}`;
+          window.open(url, "_blank");
+        });
       });
+
+      
 
       cachedScenes.set(scene.id_scene, { scene: createdScene, view, hotspots: scene.hotspots, hotspotMap, interactions: scene.interactions, interactionsMap } ,);
     }
