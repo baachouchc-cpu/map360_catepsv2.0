@@ -259,13 +259,23 @@ async function loadScene(scene, retryCount = 0) {
           
           const descBox = document.createElement("div");
           descBox.classList.add("textInfo");
-          
-        // hotspot
-          const hotspot = document.createElement("div");
-          hotspot.classList.add("hotspot");
-          hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
-          descBox.appendChild(hotspot);
-
+          console.log(r.icon_id);
+        // hotspotconst icon = document.createElement('img');
+          if (r.icon_id == 1) {
+            const hotspot = document.createElement("div");
+            hotspot.classList.add("hotspot");
+            hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
+            descBox.appendChild(hotspot);
+          } else {
+            const hotspot = document.createElement("div");
+            const icon = document.createElement('img');
+            icon.src = r.icon_url && r.icon_url.trim() !== "" 
+              ? r.icon_url 
+              : "https://cdn-icons-png.flaticon.com/512/684/684908.png";
+            icon.classList.add('hotspot-icon2');
+            hotspot.appendChild(icon);
+            descBox.appendChild(hotspot);
+          }
           // tooltip
           const tooltip = document.createElement("div");
           tooltip.classList.add("tooltip-content");
@@ -273,6 +283,18 @@ async function loadScene(scene, retryCount = 0) {
           descBox.appendChild(tooltip);
 
           wrapper.appendChild(descBox);
+
+          let clickTimer = null;
+          const CLICK_DELAY = 250; // ms
+
+          // CLICK SIMPLE → abrir imagen/link
+          wrapper.addEventListener("click", () => {
+            clickTimer = setTimeout(() => {
+              if (r.link) {
+                window.open(r.link, "_blank");
+              }
+            }, CLICK_DELAY);
+          });
         }
         
         // Interacción 2 pantalla
@@ -282,10 +304,12 @@ async function loadScene(scene, retryCount = 0) {
           descBox.classList.add("iframespot-content");
 
           // Mensaje inicial
-          const message = document.createElement("div");
-          message.classList.add("message");
-          message.textContent = "Presione para ver el contenido!";
-          descBox.appendChild(message);
+           const message = document.createElement("div");
+           message.classList.add("message");
+           message.textContent = "Presione para ver el contenido!";
+           message.style.display = "none"; // Oculta el mensaje inicialmente
+           descBox.appendChild(message);
+           
           
           // Crear iframe pero no agregarlo todavía
           const iframe = document.createElement("iframe");
@@ -295,9 +319,10 @@ async function loadScene(scene, retryCount = 0) {
           iframe.style.border = "0";
           iframe.style.width = "100%";
           iframe.style.height = "100%";
+          iframe.style.display = "block";
 
           // Inicialmente oculto
-          iframe.style.display = "none";
+          //iframe.style.display = "none";
           descBox.appendChild(iframe);
 
           wrapper.appendChild(descBox);
@@ -354,19 +379,12 @@ async function loadScene(scene, retryCount = 0) {
             const descBox = document.createElement("div");
             descBox.classList.add("textInfo");
             
-          // hotspot
-            // const hotspot = document.createElement("div");
-            // hotspot.classList.add("hotspot");
-            // hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
-            // descBox.appendChild(hotspot);
             const hotspot = document.createElement("div");
-            hotspot.classList.add("reveal");
-
             const icon = document.createElement('img');
             icon.src = r.icon_url && r.icon_url.trim() !== "" 
               ? r.icon_url 
               : "https://cdn-icons-png.flaticon.com/512/684/684908.png";
-            //icon.classList.add('hotspot-icon');
+            icon.classList.add('hotspot-icon2');
             hotspot.appendChild(icon);
             descBox.appendChild(hotspot);
 
@@ -400,6 +418,18 @@ async function loadScene(scene, retryCount = 0) {
           descBox.appendChild(tooltip);
 
           wrapper.appendChild(descBox);
+
+          let clickTimer = null;
+          const CLICK_DELAY = 250; // ms
+
+          // CLICK SIMPLE → abrir imagen/link
+          wrapper.addEventListener("click", () => {
+            clickTimer = setTimeout(() => {
+              if (r.link) {
+                window.open(r.link, "_blank");
+              }
+            }, CLICK_DELAY);
+          });
         }
 
         interactionsMap[r.id_interactions] = wrapper;
@@ -420,12 +450,19 @@ async function loadScene(scene, retryCount = 0) {
 
         // guardar referencia por si luego la necesitas
         interactionsMap[r.id_interaction] = wrapper;
+        let clickTimer = null;
+        const CLICK_DELAY = 250; // ms
 
-        // doble click
+        // DOBLE CLICK → ir a admin/login
         wrapper.addEventListener("dblclick", () => {
+          // cancelar el click simple
+          clearTimeout(clickTimer);
+          clickTimer = null;
+
           const url = `/admin/login?id_interaction=${r.id_interactions}`;
           window.open(url, "_blank");
         });
+
       });
 
       
