@@ -1,3 +1,4 @@
+
 // Variables globales y elementos DOM
 const viewerElement = document.getElementById('viewer'); 
 const sceneNameElement = document.querySelector('#titleBar .sceneName'); 
@@ -16,6 +17,73 @@ const toggleBtn = document.getElementById('toggle-sidebar');
 const API_BASE = "https://webservice-map360.onrender.com";
 //const API_BASE = "http://127.0.0.1:5000";
 const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
+
+
+// =================== SIMULADOR DE ESTADO DEL PARQUE ===================
+function getFakeParkData() {
+
+  const TOTAL_CUPOS = 150;
+
+  const now = new Date();
+
+  //Fecha completa
+  const date = now.toLocaleDateString("es-ES", {
+    weekday: "long",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+
+  const hour = now.getHours();
+  const day = now.getDay(); // 0 = domingo, 6 = sábado
+
+  //Estado según día y hora
+  let state = "Cerrado";
+
+  const esFinDeSemana = (day === 0 || day === 6);
+  const enHorario = (hour >= 8 && hour < 22);
+
+  if (!esFinDeSemana && enHorario) {
+    state = "Abierto";
+  }
+
+  //Espacios libres simulados
+  let libres = Math.floor(Math.random() * TOTAL_CUPOS);
+
+  // Nivel de ocupación
+  let crowd;
+  if (libres < 40) {
+    crowd = "Baja";
+  } else if (libres >= 40 && libres <= 80) {
+    crowd = "Media";
+  } else {
+    crowd = "Alta";
+  }
+
+  //Si está cerrado
+  if (state === "Cerrado") {
+    libres = TOTAL_CUPOS;
+    crowd = "Cerrado";
+  }
+
+  // 🕒 Hora
+  const time = now.toLocaleTimeString("es-ES", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  return {
+    state,        // Abierto / Cerrado
+    crowd,        // Alta / Media / Baja / Cerrado
+    libres,       // Cupos disponibles
+    date,         // Fecha completa
+    updatedAt: time
+  };
+}
+
+
+console.log(getFakeParkData());
+
 // Obtener el parámetro 'id' de la URL
 const urlParams = new URLSearchParams(window.location.search);
 const sceneIdFromUrl = urlParams.get('id'); // esto devuelve "10" si la URL es ?id=10
@@ -431,6 +499,54 @@ async function loadScene(scene, retryCount = 0) {
             }, CLICK_DELAY);
           });
         }
+
+        // Interacción 5 - Estado dinámico del parqueadero
+        if (r.type === 5) {
+
+          const descBox = document.createElement("div");
+          descBox.classList.add("textInfo");
+
+          const hotspot = document.createElement("div");
+          const icon = document.createElement('img');
+          icon.src = r.icon_url && r.icon_url.trim() !== ""
+            ? r.icon_url
+            : "https://cdn-icons-png.flaticon.com/512/854/854878.png";
+          icon.classList.add('hotspot-icon2');
+          hotspot.appendChild(icon);
+          descBox.appendChild(hotspot);
+
+          const tooltip = document.createElement("div");
+          tooltip.classList.add("tooltip-content");
+          descBox.appendChild(tooltip);
+
+          wrapper.appendChild(descBox);
+
+          // 🔄 Actualiza la información simulada
+          function updateParkInfo() {
+            const data = getFakeParkData();
+            tooltip.innerHTML = `
+              <div class="hotspot-info-header">
+                <span>🌳 ${r.title || "Estado del Parqueadero"}</span>
+              </div>
+              <p><b>Estado:</b> ${data.state}</p>
+              <p><b>Afluencia:</b> ${data.crowd}</p>
+              <p><b>Plazas Libres:</b> ${data.libres} / 150</p>
+              <p style="font-size:11px;color:#aaa">
+                Última actualización: ${data.date}</p>
+              <p>${data.updatedAt}</p>
+            `;
+          }
+
+          // Primera carga
+          updateParkInfo();
+
+          // ⏱️ Refrescar cada 10 segundos
+          const intervalId = setInterval(updateParkInfo, 3000);
+
+          // Limpieza (por seguridad al cambiar de escena)
+          wrapper.addEventListener("remove", () => clearInterval(intervalId));
+        }
+
 
         interactionsMap[r.id_interactions] = wrapper;
         function buildPerspective(p,e) {
