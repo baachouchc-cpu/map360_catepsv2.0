@@ -521,7 +521,7 @@ async function loadScene(scene, retryCount = 0) {
 
           wrapper.appendChild(descBox);
 
-          // 🔄 Actualiza la información simulada
+          //Actualiza la información simulada
           function updateParkInfo() {
             const data = getFakeParkData();
             tooltip.innerHTML = `
@@ -540,7 +540,7 @@ async function loadScene(scene, retryCount = 0) {
           // Primera carga
           updateParkInfo();
 
-          // ⏱️ Refrescar cada 10 segundos
+          // Refrescar cada 10 segundos
           const intervalId = setInterval(updateParkInfo, 3000);
 
           // Limpieza (por seguridad al cambiar de escena)
