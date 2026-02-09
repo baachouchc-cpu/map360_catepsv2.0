@@ -70,7 +70,7 @@ LEFT JOIN (
                'rotation', r.rotation,
                'radius', r.radius,
                'type', r.type_id,
-               'type_name', c.name
+               'type_name', c.name,
                'width_px', r.width_px,
                'height_px', r.height_px
              )
