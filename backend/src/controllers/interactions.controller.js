@@ -10,7 +10,8 @@ const upsertInteraction = async (req, res) => {
       yaw,
       pitch,
       rotation,
-      type_id
+      icon_id,
+      type_id      
     } = req.body;
 
     // Validación mínima
@@ -20,7 +21,8 @@ const upsertInteraction = async (req, res) => {
       yaw === undefined ||
       pitch === undefined ||
       rotation === undefined ||
-      !type_id
+      !icon_id ||
+      !type_id      
     ) {
       return res.status(400).json({
         error: "Faltan campos obligatorios"

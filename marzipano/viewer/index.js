@@ -82,7 +82,7 @@ function getFakeParkData() {
 }
 
 
-console.log(getFakeParkData());
+//console.log(getFakeParkData());
 
 // Obtener el parámetro 'id' de la URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -327,7 +327,7 @@ async function loadScene(scene, retryCount = 0) {
           
           const descBox = document.createElement("div");
           descBox.classList.add("textInfo");
-          console.log(r.icon_id);
+          //console.log(r.icon_id);
         // hotspotconst icon = document.createElement('img');
           if (r.icon_id == 1) {
             const hotspot = document.createElement("div");
@@ -367,9 +367,13 @@ async function loadScene(scene, retryCount = 0) {
         
         // Interacción 2 pantalla
         if (r.type === 2) {
+          const width = r.width_px || 320;    // ancho por defecto
+          const height = r.height_px || 180;  // alto por defecto
 
           const descBox = document.createElement("div");
           descBox.classList.add("iframespot-content");
+          descBox.style.width = width + "px";
+          descBox.style.height = height + "px";
 
           // Mensaje inicial
            const message = document.createElement("div");
@@ -382,8 +386,10 @@ async function loadScene(scene, retryCount = 0) {
           // Crear iframe pero no agregarlo todavía
           const iframe = document.createElement("iframe");
           iframe.src = r.link;
-          iframe.width = "1180";
-          iframe.height = "400";
+          iframe.width = width
+          iframe.height = height;
+          //iframe.width = "1180";
+          //iframe.height = "400";
           iframe.style.border = "0";
           iframe.style.width = "100%";
           iframe.style.height = "100%";

@@ -52,6 +52,8 @@ function fillForm(data) {
   document.getElementById("rotation").value = data.rotation;
   document.getElementById("radius").value = data.radius || "";
   document.getElementById("type_id").value = data.type_id;
+  document.getElementById("width_px").value = data.width_px || "";
+  document.getElementById("height_px").value = data.height_px || "";
 }
 
 /**
@@ -71,7 +73,9 @@ async function saveInteraction(e) {
     icon_id: document.getElementById("icon_id").value,
     rotation: document.getElementById("rotation").value,
     radius: document.getElementById("radius").value,
-    type_id: document.getElementById("type_id").value
+    type_id: document.getElementById("type_id").value,
+    width_px: document.getElementById("width_px").value,
+    height_px: document.getElementById("height_px").value
   };
 
   const method = body.id_interactions ? "PUT" : "POST";

@@ -15,7 +15,9 @@ const Interactions = {
       icon_id,
       rotation,
       radius,
-      type_id
+      type_id,
+      width_px,
+      height_px
     } = data;
     // If an id is provided we perform an upsert using ON CONFLICT on that id.
     // If no id is provided we insert without the id column so the DB can
@@ -33,9 +35,11 @@ const Interactions = {
           icon_id,
           rotation,
           radius,
-          type_id
+          type_id,
+          width_px,
+          height_px
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
         ON CONFLICT (id_interactions)
         DO UPDATE SET
           scene_id   = EXCLUDED.scene_id,
@@ -47,7 +51,9 @@ const Interactions = {
           icon_id    = EXCLUDED.icon_id,
           rotation   = EXCLUDED.rotation,
           radius     = EXCLUDED.radius,
-          type_id    = EXCLUDED.type_id
+          type_id    = EXCLUDED.type_id,
+          width_px   = EXCLUDED.width_px,
+          height_px  = EXCLUDED.height_px
         RETURNING *;
       `;
 
@@ -62,7 +68,9 @@ const Interactions = {
         icon_id || null,
         rotation,
         radius || null,
-        type_id
+        type_id,
+        width_px || null,
+        height_px || null
       ];
 
       const { rows } = await pool.query(query, values);
@@ -81,9 +89,11 @@ const Interactions = {
         icon_id,
         rotation,
         radius,
-        type_id
+        type_id,
+        width_px,
+        height_px
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
       RETURNING *;
     `;
 
@@ -97,7 +107,9 @@ const Interactions = {
       icon_id || null,
       rotation,
       radius || null,
-      type_id
+      type_id,
+      width_px || null,
+      height_px || null
     ];
 
     const { rows } = await pool.query(insertQuery, insertValues);
