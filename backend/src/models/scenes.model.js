@@ -71,6 +71,8 @@ LEFT JOIN (
                'radius', r.radius,
                'type', r.type_id,
                'type_name', c.name
+               'width_px', r.width_px,
+               'height_px', r.height_px
              )
            ) AS interactions
     FROM interactions r

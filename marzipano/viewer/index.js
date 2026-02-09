@@ -369,7 +369,7 @@ async function loadScene(scene, retryCount = 0) {
         if (r.type === 2) {
           const width = r.width_px || 320;    // ancho por defecto
           const height = r.height_px || 180;  // alto por defecto
-
+    
           const descBox = document.createElement("div");
           descBox.classList.add("iframespot-content");
           descBox.style.width = width + "px";
