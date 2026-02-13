@@ -14,10 +14,80 @@ const sceneListElement = document.getElementById("sceneList");
 const sidebar = document.getElementById('sidebar');
 const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
-const API_BASE = "https://webservice-map360.onrender.com";
-//const API_BASE = "http://127.0.0.1:5000";
+//const API_BASE = "https://webservice-map360.onrender.com";
+const API_BASE = "http://127.0.0.1:5000";
 const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
 
+// Elementos para interacción con contraseña
+let currentInteraction = null;
+
+// Funciones para el modal de contraseña
+function openPasswordModal(interaction) {
+  currentInteraction = interaction;
+
+  const modal = document.getElementById("passwordModal");
+  const input = document.getElementById("interactionPassword");
+  const errorText = document.getElementById("passwordError");
+
+  if (!modal || !input) {
+    console.error("Modal o input no encontrados");
+    return;
+  }
+
+  input.value = "";
+  errorText.textContent = "";
+  modal.classList.remove("hidden");
+}
+
+function closePasswordModal() {
+  const modal = document.getElementById("passwordModal");
+  if (modal) modal.classList.add("hidden");
+}
+
+// Configuración de eventos para el modal de contraseña
+document.addEventListener("DOMContentLoaded", () => {
+  const btnCancel = document.getElementById("passwordCancel");
+  const btnSubmit = document.getElementById("passwordSubmit");
+  const input = document.getElementById("interactionPassword");
+  const errorText = document.getElementById("passwordError");
+
+  if (!btnCancel || !btnSubmit) {
+    console.error("Botones del modal no encontrados");
+    return;
+  }
+
+  btnCancel.onclick = closePasswordModal;
+
+  btnSubmit.onclick = async () => {
+    if (!currentInteraction) return;
+
+    const password = input.value;
+
+    try {
+      const res = await fetch(
+        `/api/interactions/${currentInteraction.id_interactions}/pass_word`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        }
+      );
+
+      if (!res.ok) {
+        errorText.textContent = "❌ Contraseña incorrecta";
+        return;
+      }
+
+      closePasswordModal();
+
+      if (currentInteraction.link) {
+        window.open(currentInteraction.link, "_blank");
+      }
+    } catch (err) {
+      errorText.textContent = "❌ Error del servidor";
+    }
+  };
+});
 
 // =================== SIMULADOR DE ESTADO DEL PARQUE ===================
 function getFakeParkData() {
@@ -355,9 +425,10 @@ async function loadScene(scene, retryCount = 0) {
           let clickTimer = null;
           const CLICK_DELAY = 250; // ms
 
-          // CLICK SIMPLE → abrir imagen/link
+          // CLICK PROTEGIDO → comprobar contraseña y abrir link
           wrapper.addEventListener("click", () => {
             clickTimer = setTimeout(() => {
+
               if (r.link) {
                 window.open(r.link, "_blank");
               }
@@ -553,6 +624,46 @@ async function loadScene(scene, retryCount = 0) {
           wrapper.addEventListener("remove", () => clearInterval(intervalId));
         }
 
+        // Interacción 6 - Hotspot personalizado con password  
+        if (r.type === 6) {
+          
+          const descBox = document.createElement("div");
+          descBox.classList.add("textInfo");
+          
+          if (r.icon_id == 1) {
+            const hotspot = document.createElement("div");
+            hotspot.classList.add("hotspot");
+            hotspot.innerHTML = `<div class="out"></div><div class="in"></div>`;
+            descBox.appendChild(hotspot);
+          } else {
+            const hotspot = document.createElement("div");
+            const icon = document.createElement('img');
+            icon.src = r.icon_url && r.icon_url.trim() !== "" 
+              ? r.icon_url 
+              : "https://cdn-icons-png.flaticon.com/512/684/684908.png";
+            icon.classList.add('hotspot-icon2');
+            hotspot.appendChild(icon);
+            descBox.appendChild(hotspot);
+          }
+          // tooltip
+          const tooltip = document.createElement("div");
+          tooltip.classList.add("tooltip-content");
+          tooltip.innerHTML = `<div class="hotspot-info-header"><span>ℹ️ ${r.title}</span></div><p>${r.description}</p>`;
+          descBox.appendChild(tooltip);
+
+          wrapper.appendChild(descBox);
+
+          let clickTimer = null;
+          const CLICK_DELAY = 250; // ms
+
+          // CLICK PROTEGIDO → comprobar contraseña y abrir link
+          wrapper.addEventListener("click", () => {
+            clickTimer = setTimeout(() => {
+              openPasswordModal(r);
+            }, CLICK_DELAY);
+          });
+        }
+
 
         interactionsMap[r.id_interactions] = wrapper;
         function buildPerspective(p,e) {
@@ -571,7 +682,7 @@ async function loadScene(scene, retryCount = 0) {
         }
 
         // guardar referencia por si luego la necesitas
-        interactionsMap[r.id_interaction] = wrapper;
+        interactionsMap[r.id_interactions] = wrapper; //685
         let clickTimer = null;
         const CLICK_DELAY = 250; // ms
 
@@ -591,7 +702,6 @@ async function loadScene(scene, retryCount = 0) {
 
       cachedScenes.set(scene.id_scene, { scene: createdScene, view, hotspots: scene.hotspots, hotspotMap, interactions: scene.interactions, interactionsMap } ,);
     }
-
     // Cambiar escena y actualizar el índice actual
     const cached = cachedScenes.get(scene.id_scene);
     if (cached) {

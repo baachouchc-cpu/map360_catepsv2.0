@@ -15,8 +15,11 @@ const routesRoutes = require("./routes/routes.routes");
 const searchRoutes = require("./routes/search.routes");
 const interactionsRoutes = require("./routes/interactions.routes");
 const authRoutes = require("./routes/auth.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 // Middleware auth
+const auth = require("./middlewares/auth.middleware");
+const role = require("./middlewares/role.middleware");
 const authMiddleware = require("./middlewares/authMiddleware");
 
 // Middlewares globales
@@ -30,6 +33,8 @@ app.use('/api/scenes', scenesRoutes);
 app.use('/api', routesRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/interactions", interactionsRoutes);
+app.use("/api/users", auth, role, require("./routes/auth.routes"));
+app.use("/api/admin", adminRoutes);
 
 // FRONTEND STATIC
 const frontendPath = path.join(__dirname, "../../marzipano");
@@ -51,12 +56,16 @@ const adminPath = path.join(frontendPath, "admin");
 
 // LOGIN (SIN protección)
 app.get("/admin/login", (req, res) => {
-  res.sendFile(path.join(adminPath, "login.html"));
+  res.sendFile(path.join(adminPath,"pages", "login.html"));
 });
 
 // PANEL ADMIN (PROTEGIDO)
-app.get("/admin", authMiddleware, (req, res) => {
-  res.sendFile(path.join(adminPath, "index.html"));
+app.get("/admin", authMiddleware, role(1), (req, res) => {
+  res.sendFile(path.join(adminPath,"pages", "index.html"));
+});
+
+app.get("/tecnic", authMiddleware, role(2), (req, res) => {
+  res.sendFile(path.join(adminPath,"pages", "tecnic.html"));
 });
 
 // Archivos estáticos admin (css/js)

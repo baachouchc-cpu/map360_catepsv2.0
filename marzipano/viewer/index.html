@@ -126,5 +126,22 @@
   <script src="//www.marzipano.net/demos/common/bowser.js"></script>
   <script src="lib/marzipano.js"></script>
   <script src="index.js"></script>
+
+  <div id="passwordModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>🔐 Contenido protegido</h3>
+      <input
+        type="password"
+        id="interactionPassword"
+        placeholder="Introduce la contraseña"
+      />
+      <p id="passwordError" class="error"></p>
+      <div class="modal-actions">
+        <button id="passwordCancel">Cancelar</button>
+        <button id="passwordSubmit">Acceder</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
