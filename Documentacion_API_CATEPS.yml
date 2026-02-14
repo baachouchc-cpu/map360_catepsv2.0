@@ -4,63 +4,268 @@ info:
   version: '1.0'
 servers:
   - url: https://webservice-map360.onrender.com/api
+
 paths:
   /scenes:
     get:
-      responses:
-        '200':
-          description: OK, Lista de escenes con sus respectivos hotspots.
-  /scenes/names:
-    get:
-      responses:
-        '200':
-          description: OK, Lista de escenes con sus respectivos hotspots.
-
-  /routes:
-    get:
-      description: ''
+      description: 'Lista de escenas con sus respectivos hotspots y puntos interactivos'
       parameters: []
       responses:
         '200':
-          description: OK, Lista de rutas con sus respectivos puntos de interes.
+          description: OK.
+  /scenes/names:
+    get:
+      description: 'Lista de nombres de las escenas disponibles en el sistema'
+      responses:
+        '200':
+          description: OK.
+
+  /routes:
+    get:
+      description: 'Lista de rutas disponibles en el sistema, cada ruta incluye sus respectivos puntos de interes'
+      parameters: []
+      responses:
+        '200':
+          description: OK.
 
   /search:
     get:
-      description: ''
+      description: 'Resultados de la busqueda segun el query proporcionado, se buscara en los nombres de las escenas, hotspots y puntos de interes'
       parameters:
         - name: query
           in: query
           required: true
           schema:
             type: string
+            example: "aula"
       responses:
         '200':
-          description: OK, Resultados de la busqueda segun el query.
+          description: OK.
+
   /rebuild-edges:
     post:
-      description: ''
+      description: 'Reconstruccion de aristas o grafos de las escenas, se utiliza para actualizar las conexiones entre escenas, hotspots y puntos de interes en el sistema.'
       parameters: []
       responses:
         '200':
-          description: OK, Reconstruccion de aristas o grafos de las escenas.
+          description: OK.
+
+  /interactions/types:
+    get:
+      description: 'Obtiene los tipos de interacciones disponibles en el sistema, como por ejemplo: informativo, pantalla, etc.'
+      parameters: []
+      responses:
+        '200':
+          description: OK.
+
+  /interactions/icons:
+    get:
+      description: 'Obtiene los iconos de las interacciones disponibles en el sistema'
+      parameters: []
+      responses:
+        '200':
+          description: OK.
+
   /interactions:
     post:
-      description: ''
+      description: 'Creación de una nueva interacción con los datos proporcionados.'
       parameters: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               type: object
               properties:
-                userId:
+                scene_id:
+                  type: integer
+                  example: 1
+                title:
                   type: string
-                sceneId:
+                  example: "Aula Magna"
+                yaw:
+                  type: number
+                  example: 1.57
+                pitch:
+                  type: number
+                  example: 0
+                description:
                   type: string
-                hotspotId:
+                  example: "Esta interacción proporciona información detallada sobre el aula, incluyendo su historia, características y eventos relacionados."
+                link:
                   type: string
-                timestamp:
+                  example: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                icon_id:
+                  type: integer
+                  example: 2
+                rotation:
+                  type: number
+                  example: 0
+                radius:
+                  type: number
+                  example: 1
+                type_id:
+                  type: integer
+                  example: 1
+                width_px:
+                  type: integer
+                  example: 200
+                height_px:
+                  type: integer
+                  example: 150
+                pass_word:
                   type: string
+                  example: "contraseña123"
       responses:
         '200':
-          description: OK, Registro de la interaccion del usuario con el hotspot.
+          description: OK.
+
+  /interactions/{id}:
+    get:
+      description: 'Detalles de una interacción específica, incluyendo su tipo, icono, y cualquier información adicional relevante.'
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 15
+      responses:
+        '200':
+          description: OK.
+    
+    put:
+      description: 'Actualización de la descripción de una interacción específica, proporcionando información detallada sobre su función, contenido o cualquier otro aspecto relevante para los usuarios.'
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 15 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                scene_id:
+                  type: integer
+                  example: 1
+                title:
+                  type: string
+                  example: "Aula Magna"
+                yaw:
+                  type: number
+                  example: 1.57
+                pitch:
+                  type: number
+                  example: 0
+                description:
+                  type: string
+                  example: "Esta interacción proporciona información detallada sobre el aula, incluyendo su historia, características y eventos relacionados."
+                link:
+                  type: string
+                  example: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                icon_id:
+                  type: integer
+                  example: 2
+                rotation:
+                  type: number
+                  example: 0
+                radius:
+                  type: number
+                  example: 1
+                type_id:
+                  type: integer
+                  example: 1
+                width_px:
+                  type: integer
+                  example: 200
+                height_px:
+                  type: integer
+                  example: 150
+                pass_word:
+                  type: string
+                  example: "contraseña123"
+      responses:
+        '200':
+          description: OK.
+
+  /interactions/{id}/description:
+    put:
+      description: 'Actualización de la descripción de una interacción específica, proporcionando información detallada sobre su función, contenido o cualquier otro aspecto relevante para los usuarios.'
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 15
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  example: "Esta interacción proporciona información detallada sobre el aula, incluyendo su historia, características y eventos relacionados."
+      responses:
+        '200':
+          description: OK.
+
+  /interactions/{id}/pass_word:
+    post:
+      description: 'Validación de la contraseña para acceder a una interacción específica, permitiendo a los usuarios ingresar la contraseña correcta para desbloquear el contenido o la funcionalidad asociada a esa interacción.'
+      parameters: 
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 15
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "contraseña123"
+      responses:
+        '200':
+          description: OK.
+
+  /auth/login:
+    post:
+      description: 'Inicia sesión de un usuario'
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "usuario123"
+                password:
+                  type: string
+                  example: "contraseña123"
+      responses:
+        '200':
+          description: OK.
+
+  /auth/logout:
+    post:
+      description: 'Cierra la sesión del usuario actual'
+      parameters: []
+      responses:
+        '200':
+          description: OK.
