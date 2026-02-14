@@ -1,4 +1,4 @@
-// admin.js
+// tecnic.js
 document.addEventListener("DOMContentLoaded", initAdmin);
 
 function getCookie(name) {
@@ -12,14 +12,16 @@ async function initAdmin() {
   const params = new URLSearchParams(window.location.search);
   const interactionId = params.get("id_interaction");
 
+   // 🚫 si no hay id → fuera
+  if (!interactionId) {
+    logout();
+    return; // ⬅️ MUY IMPORTANTE (detiene la ejecución)
+  }
+
   // Bind submit una sola vez
   document.getElementById("interactionForm").addEventListener("submit", saveInteraction);
-
-  if (interactionId) {
-    await loadInteraction(interactionId);
-  } else {
-    resetForm();
-  }
+  // Cargar datos de la interacción
+  await loadInteraction(interactionId);
 }
 
 /**
@@ -70,8 +72,8 @@ async function saveInteraction(e) {
   });
 
   if (res.ok) {
-    alert("Actualizado correctamente");
-    window.location.href = "/tecnic";
+    alert("Actualizado correctamente. Sesión cerrada por seguridad.");
+    logout();
   } else {
     alert("Error guardando datos");
   }
@@ -91,5 +93,6 @@ function resetForm() {
 async function logout() {
   await fetch("/api/auth/logout", { method: "POST" });
   window.location.href = "/admin/login";
+  //alert("Sesión cerrada. Por seguridad, por favor vuelva a iniciar sesión.");
 }
 

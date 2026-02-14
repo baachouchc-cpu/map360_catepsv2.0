@@ -1,4 +1,5 @@
 // admin.js
+let isEditMode = false;
 document.addEventListener("DOMContentLoaded", initAdmin);
 
 function getCookie(name) {
@@ -19,15 +20,16 @@ async function initAdmin() {
 
   // ejecutarlo al cargar (modo edición)
   toggleFieldsByType();
-
   typeSelect.addEventListener("change", toggleFieldsByType);
 
   // Bind submit una sola vez
   document.getElementById("interactionForm").addEventListener("submit", saveInteraction);
 
   if (interactionId) {
+    isEditMode = true;
     await loadInteraction(interactionId);
   } else {
+    isEditMode = false;
     resetForm();
   }
 }
@@ -240,8 +242,10 @@ async function saveInteraction(e) {
     pass_word: document.getElementById("password").value || null
   };
 
-  const method = body.id_interactions ? "PUT" : "POST";
-  const url = body.id_interactions
+  const isEditMode = !!body.id_interactions;
+  const method = isEditMode ? "PUT" : "POST";
+  //const method = body.id_interactions ? "PUT" : "POST";
+  const url = isEditMode
     ? `/api/interactions/${body.id_interactions}`
     : `/api/interactions`;
 
@@ -252,8 +256,26 @@ async function saveInteraction(e) {
   });
 
   if (res.ok) {
-    alert("Guardado correctamente");
-    window.location.href = "/admin";
+    //alert("Guardado correctamente");
+    //window.location.href = "/admin";
+    if (isEditMode) {
+      alert("Actualización completada. Sesión cerrada. Por seguridad, por favor vuelva a iniciar sesión.");
+
+      // 🔐 borrar sesión
+      localStorage.removeItem("token");
+
+      // 🔁 ir al login
+      window.location.href = "/admin/login";
+
+    } else {
+      alert("Interacción creada correctamente");
+
+      // 🧹 limpiar formulario para crear otra
+      document.getElementById("interactionForm").reset();
+
+      // 👇 volver a aplicar reglas visuales
+      toggleFieldsByType();
+    }
   } else {
     alert("Error guardando datos");
   }
