@@ -45,6 +45,29 @@ const upsertInteraction = async (req, res) => {
   }
 };
 
+// Controlador para obtener solo id y name de las escenas
+const getNameTypes = async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT * FROM itypes ORDER BY name"
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: "Error obteniendo tipos de interacción" });
+  }
+};
+
+// Controlador para obtener solo id y name de las escenas
+const getNameIcon = async (req, res) => {
+  try {
+    const result = await db.query(
+      "SELECT id_icon, name_icon FROM icons ORDER BY name_icon"
+    );
+    res.json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: "Error obteniendo iconos" });
+  }
+};
 
 // GET BY ID
 const getInteractionById = async (req, res) => {
@@ -52,7 +75,8 @@ const getInteractionById = async (req, res) => {
     const { id } = req.params;
 
     const { rows } = await db.query(
-      "SELECT * FROM interactions WHERE id_interactions = $1",
+      "SELECT   i.*,  s.description AS scene_name FROM interactions i JOIN scenes s  ON s.id_scene = i.scene_id WHERE i.id_interactions = $1",
+//      "SELECT * FROM interactions WHERE id_interactions = $1",
       [id]
     );
 
@@ -106,12 +130,6 @@ const validateInteractionPassword = async (req, res) => {
     }
     
     const savedPassword = result.rows[0].pass_word;
-    
-
-    // 🔓 No tiene contraseña → acceso libre
-    // if (!savedPassword) {
-    //   return res.json({ access: true });
-    // }
 
     // 🔐 Comparar contraseña
     const ok = await bcrypt.compare(password, savedPassword);
@@ -129,6 +147,7 @@ module.exports = {
   upsertInteraction,
   getInteractionById,
   updateInteractionDescription,
-  validateInteractionPassword 
+  validateInteractionPassword,
+  getNameTypes,
+  getNameIcon
 };
-

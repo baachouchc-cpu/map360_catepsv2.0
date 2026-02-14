@@ -14,8 +14,8 @@ const sceneListElement = document.getElementById("sceneList");
 const sidebar = document.getElementById('sidebar');
 const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
-const API_BASE = "https://webservice-map360.onrender.com";
-//const API_BASE = "http://127.0.0.1:5000";
+//const API_BASE = "https://webservice-map360.onrender.com";
+const API_BASE = "http://127.0.0.1:5000";
 const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
 
 // Elementos para interacción con contraseña
@@ -459,8 +459,6 @@ async function loadScene(scene, retryCount = 0) {
           iframe.src = r.link;
           iframe.width = width
           iframe.height = height;
-          //iframe.width = "1180";
-          //iframe.height = "400";
           iframe.style.border = "0";
           iframe.style.width = "100%";
           iframe.style.height = "100%";
@@ -472,20 +470,43 @@ async function loadScene(scene, retryCount = 0) {
 
           wrapper.appendChild(descBox);
 
-          let expanded = false;
+          // 🔘 Botón flotante
+          const toggleBtnscreen = document.createElement("button");
+          toggleBtnscreen.classList.add("iframe-toggle-btn");
+          toggleBtnscreen.textContent = "—"; // icono minimizar
 
-          wrapper.addEventListener("click", () => {
-            expanded = !expanded;
-            if (expanded) {
-              message.style.display = "none"; // Oculta el mensaje
-              iframe.style.display = "block";  // Muestra el iframe
-              titleBox.style.display = "none";
+          descBox.appendChild(toggleBtnscreen);
+
+          let minimized = false;
+
+          toggleBtnscreen.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            minimized = !minimized;
+
+            if (minimized) {
+              descBox.classList.add("minimized");
+              toggleBtnscreen.textContent = "⬜"; // restaurar
             } else {
-              message.style.display = "block"; // Vuelve a mostrar el mensaje
-              iframe.style.display = "none";    // Oculta el iframe
-              titleBox.style.display = "block";
+              descBox.classList.remove("minimized");
+              toggleBtnscreen.textContent = "—"; // minimizar
             }
           });
+
+          let expanded = false;
+
+          // wrapper.addEventListener("click", () => {
+          //   expanded = !expanded;
+          //   if (expanded) {
+          //     message.style.display = "none"; // Oculta el mensaje
+          //     iframe.style.display = "block";  // Muestra el iframe
+          //     titleBox.style.display = "none";
+          //   } else {
+          //     message.style.display = "block"; // Vuelve a mostrar el mensaje
+          //     iframe.style.display = "none";    // Oculta el iframe
+          //     titleBox.style.display = "block";
+          //   }
+          // });
         }
 
         // Interacción 3 flotante

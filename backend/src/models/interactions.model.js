@@ -17,7 +17,8 @@ const Interactions = {
       radius,
       type_id,
       width_px,
-      height_px
+      height_px,
+      pass_word
     } = data;
     // If an id is provided we perform an upsert using ON CONFLICT on that id.
     // If no id is provided we insert without the id column so the DB can
@@ -37,9 +38,13 @@ const Interactions = {
           radius,
           type_id,
           width_px,
-          height_px
+          height_px,
+          pass_word
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,CASE 
+        WHEN $14::text IS NULL OR $14::text = '' THEN NULL
+          ELSE crypt($14::text, gen_salt('bf', 10))
+        END)
         ON CONFLICT (id_interactions)
         DO UPDATE SET
           scene_id   = EXCLUDED.scene_id,
@@ -53,7 +58,8 @@ const Interactions = {
           radius     = EXCLUDED.radius,
           type_id    = EXCLUDED.type_id,
           width_px   = EXCLUDED.width_px,
-          height_px  = EXCLUDED.height_px
+          height_px  = EXCLUDED.height_px,
+          pass_word  = COALESCE(EXCLUDED.pass_word, interactions.pass_word)
         RETURNING *;
       `;
 
@@ -70,7 +76,8 @@ const Interactions = {
         radius || null,
         type_id,
         width_px || null,
-        height_px || null
+        height_px || null,
+        pass_word || null 
       ];
 
       const { rows } = await pool.query(query, values);
@@ -91,9 +98,13 @@ const Interactions = {
         radius,
         type_id,
         width_px,
-        height_px
+        height_px,
+        pass_word
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,CASE 
+      WHEN $13::text IS NULL OR $13::text = '' THEN NULL
+        ELSE crypt($13::text, gen_salt('bf', 10))
+      END)
       RETURNING *;
     `;
 
@@ -109,7 +120,8 @@ const Interactions = {
       radius || null,
       type_id,
       width_px || null,
-      height_px || null
+      height_px || null,
+      pass_word || null
     ];
 
     const { rows } = await pool.query(insertQuery, insertValues);

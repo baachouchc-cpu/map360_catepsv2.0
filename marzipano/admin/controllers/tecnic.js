@@ -42,8 +42,11 @@ async function loadInteraction(id) {
 */
 function fillForm(data) {
   document.getElementById("id_interactions").value = data.id_interactions;
-  document.getElementById("scene_id").value = data.scene_id;
+  document.getElementById("id_interactions").disabled = true;
+  document.getElementById("scene_name").value = data.scene_name;
+  document.getElementById("scene_name").disabled = true;
   document.getElementById("title").value = data.title;
+  document.getElementById("title").disabled = true;
   document.getElementById("description").value = data.description || "";
 }
 
@@ -67,7 +70,7 @@ async function saveInteraction(e) {
   });
 
   if (res.ok) {
-    alert("Guardado correctamente");
+    alert("Actualizado correctamente");
     window.location.href = "/tecnic";
   } else {
     alert("Error guardando datos");

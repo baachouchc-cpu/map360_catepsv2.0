@@ -13,43 +13,57 @@
 
   <input type="hidden" id="id_interactions">
 
-  <label>Scene ID</label>
-  <input type="number" id="scene_id" required>
+  <label>Nombre de Escena<span class="required">*</span></label>
+  <select id="scene_id" required>
+    <option value="">Cargando escenas...</option>
+  </select>
 
-  <label>Título</label>
+  <label>Título<span class="required">*</span></label>
   <input type="text" id="title" required>
 
-  <label>Yaw</label>
+  <label>Yaw<span class="required">*</span></label>
   <input type="number" step="any" id="yaw" required>
 
-  <label>Pitch</label>
+  <label>Pitch<span class="required">*</span></label>
   <input type="number" step="any" id="pitch" required>
 
   <label>Descripción</label>
   <textarea id="description"></textarea>
-
-  <label>Link</label>
+  
+  <label id="lbl_link">Link</label>
   <input type="text" id="link">
 
-  <label>Icon ID</label>
-  <input type="number" id="icon_id">
+  <label>Icono<span class="required">*</span></label>
+  <select id="icon_id" required>
+    <option value="">Cargando tipos...</option>
+  </select>
 
-  <label>Rotación</label>
+  <label>Rotación<span class="required">*</span></label>
   <input type="number" step="any" id="rotation" required>
 
-  <label>Radio</label>
-  <input type="number" id="radius">
+  <label>Tipo<span class="required">*</span></label>
+  <select id="type_id" required>
+    <option value="">Cargando tipos...</option>
+  </select>
 
-  <label>Type ID</label>
-  <input type="number" id="type_id" required>
+  <div class="form-group" id="group_screen">
+    <label id="lbl_radius">Radio</label>
+    <input type="number" id="radius">
 
-  <label>Ancho (px)</label>
-  <input type="number" id="width_px">
+    <label id="lbl_width">Ancho (px)</label>
+    <input type="number" id="width_px">
 
-  <label>Alto (px)</label>
-  <input type="number" id="height_px">
+    <label id="lbl_height">Alto (px)</label>
+    <input type="number" id="height_px">
+  </div>
 
-  <button type="submit">Guardar</button>
+  <div class="form-group" id="group_password">
+    <label id="lbl_password">Contraseña</label>
+    <input type="password" id="password">
+    <small id="passwordHint" class="hint"></small>
+  </div>
+
+  <button type="submit">Crear/Actualizar</button>
 
   <button onclick="logout()">Cerrar sesión</button>
 

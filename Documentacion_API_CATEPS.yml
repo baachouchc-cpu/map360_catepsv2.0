@@ -1,0 +1,66 @@
+openapi: '3.0.3'
+info:
+  title: API Mapa 360° CATEPS Universidad de Sevilla 
+  version: '1.0'
+servers:
+  - url: https://webservice-map360.onrender.com/api
+paths:
+  /scenes:
+    get:
+      responses:
+        '200':
+          description: OK, Lista de escenes con sus respectivos hotspots.
+  /scenes/names:
+    get:
+      responses:
+        '200':
+          description: OK, Lista de escenes con sus respectivos hotspots.
+
+  /routes:
+    get:
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: OK, Lista de rutas con sus respectivos puntos de interes.
+
+  /search:
+    get:
+      description: ''
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK, Resultados de la busqueda segun el query.
+  /rebuild-edges:
+    post:
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: OK, Reconstruccion de aristas o grafos de las escenas.
+  /interactions:
+    post:
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+                sceneId:
+                  type: string
+                hotspotId:
+                  type: string
+                timestamp:
+                  type: string
+      responses:
+        '200':
+          description: OK, Registro de la interaccion del usuario con el hotspot.
