@@ -18,7 +18,9 @@ const Interactions = {
       type_id,
       width_px,
       height_px,
-      pass_word
+      pass_word,
+      api_key,
+      update_api
     } = data;
     // If an id is provided we perform an upsert using ON CONFLICT on that id.
     // If no id is provided we insert without the id column so the DB can
@@ -39,12 +41,14 @@ const Interactions = {
           type_id,
           width_px,
           height_px,
-          pass_word
+          pass_word,
+          api_key,
+          update_api
         )
         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,CASE 
         WHEN $14::text IS NULL OR $14::text = '' THEN NULL
           ELSE crypt($14::text, gen_salt('bf', 10))
-        END)
+        END, $15, $16)
         ON CONFLICT (id_interactions)
         DO UPDATE SET
           scene_id   = EXCLUDED.scene_id,
@@ -59,7 +63,9 @@ const Interactions = {
           type_id    = EXCLUDED.type_id,
           width_px   = EXCLUDED.width_px,
           height_px  = EXCLUDED.height_px,
-          pass_word  = COALESCE(EXCLUDED.pass_word, interactions.pass_word)
+          pass_word  = COALESCE(EXCLUDED.pass_word, interactions.pass_word),
+          api_key    = EXCLUDED.api_key,
+          update_api    = EXCLUDED.update_api
         RETURNING *;
       `;
 
@@ -77,7 +83,9 @@ const Interactions = {
         type_id,
         width_px || null,
         height_px || null,
-        pass_word || null 
+        pass_word || null,
+        api_key || null,
+        update_api || null
       ];
 
       const { rows } = await pool.query(query, values);
@@ -99,12 +107,14 @@ const Interactions = {
         type_id,
         width_px,
         height_px,
-        pass_word
+        pass_word,
+        api_key,
+        update_api
       )
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,CASE 
       WHEN $13::text IS NULL OR $13::text = '' THEN NULL
         ELSE crypt($13::text, gen_salt('bf', 10))
-      END)
+      END, $14, $15)
       RETURNING *;
     `;
 
@@ -121,7 +131,9 @@ const Interactions = {
       type_id,
       width_px || null,
       height_px || null,
-      pass_word || null
+      pass_word || null,
+      api_key || null,
+      update_api || null
     ];
 
     const { rows } = await pool.query(insertQuery, insertValues);

@@ -16,7 +16,7 @@ const viewerDiv = document.getElementById('viewer');
 const toggleBtn = document.getElementById('toggle-sidebar');
 const API_BASE = "https://webservice-map360.onrender.com";
 //const API_BASE = "http://127.0.0.1:5000";
-const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
+//const API_WEATHER_BASE = "https://api.openweathermap.org/data/2.5/weather";
 
 // Elementos para interacción con contraseña
 let currentInteraction = null;
@@ -509,17 +509,24 @@ async function loadScene(scene, retryCount = 0) {
           // });
         }
 
-        // Interacción 3 flotante
+        // Interacción 3 APIs
         if (r.type === 3) {
 
-          const API_KEY_WEATHER='6d416edfec1ce5ad425a02f84f2e5086';
-
-          async function fetchWeather() {
-            const response = await fetch(`${API_WEATHER_BASE}?q=Seville&appid=${API_KEY_WEATHER}&units=metric&lang=es`);
+          //const API_KEY_WEATHER='6d416edfec1ce5ad425a02f84f2e5086';
+          const API_WEATHER_BASE = r.link; // URL base para la API del clima (debe venir en el campo 'link' de la interacción)
+          const API_KEY_WEATHER = r.api_key; // Clave de API para el servicio del clima (debe venir en el campo 'api_key' de la interacción)
+          
+          // Función para obtener datos del clima usando la API
+          async function fetchAPI() {
+            const separator = API_WEATHER_BASE.includes("?") ? "&" : "?";
+            const url = `${API_WEATHER_BASE}${separator}${API_KEY_WEATHER}`;
+            //const response = await fetch(`${API_WEATHER_BASE}?q=Seville&appid=${API_KEY_WEATHER}&units=metric&lang=es`);
+            const response = await fetch(url);
             const weatherData = await response.json();
             return weatherData;
           }
-
+          
+          // Función para formatear la fecha y hora actual en español
           function fechaFormateada() {
             const fecha = new Date();
 
@@ -537,11 +544,54 @@ async function loadScene(scene, retryCount = 0) {
 
             return `${diaSemana}, ${dia} ${mes} ${año} ${horas}:${minutos}`;
           }
+          
+          // Función para obtener un valor de un objeto anidado usando una ruta tipo "main.temp" o "weather[0].description"
+          function getValueFromPath(obj, path) {
 
-          fetchWeather().then(weather => {
+            return path
+              .replace(/\[(\d+)\]/g, ".$1") // convierte [0] → .0
+              .split(".")
+              .reduce((acc, part) => acc?.[part], obj);
 
+          }
+
+          // Función para reemplazar placeholders en la plantilla con valores de los datos de la API  
+          function mapTemplate(template, data) {
+            return template.replace(/{(.*?)}/g, (_, path) => {
+              const value = getValueFromPath(data, path.trim());
+              return value ?? "N/A";
+            });
+          }
+
+          // function getValueFromPath(obj, path) {
+          //   return path.split(".").reduce((acc, part) => acc?.[part], obj);
+          // }
+
+          // Función para construir el texto del tooltip a partir de la descripción y los datos de la API
+          function buildApiText(template, data, showDate) {
+
+            let result = mapTemplate(template, data);
+
+            // convertir ; en saltos de línea HTML
+            result = result.split(";").join("<br>");
+
+            if (showDate) {
+              result = `Actualizado: ${fechaFormateada()}<br>` + result;
+            }
+
+            return result;
+          }
+
+          // Obtener datos del clima y mostrar tooltip
+          fetchAPI().then(apiData => {
+            
             // Puedes usar los datos del clima aquí
-            const weatherInfo = `${fechaFormateada()} <br> Clima en ${weather.name}: ${weather.weather[0].description} <br> Temperatura: ${weather.main.temp}°C <br> Humedad: ${weather.main.humidity}%`;
+            const apiInfo = buildApiText(
+              r.description,      // 👈 lo que viene de BD
+              apiData,            // 👈 respuesta API
+              r.update_api        // 👈 mostrar fecha solo si es true
+            );
+            
             const descBox = document.createElement("div");
             descBox.classList.add("textInfo");
             
@@ -557,7 +607,7 @@ async function loadScene(scene, retryCount = 0) {
             // tooltip
             const tooltip = document.createElement("div");
             tooltip.classList.add("tooltip-content");
-            tooltip.innerHTML = `<div class="hotspot-info-header"><span>${r.title}</span></div><p>${weatherInfo}<p>`;
+            tooltip.innerHTML = `<div class="hotspot-info-header"><span>${r.title}</span></div><p>${apiInfo}</p>`;
             descBox.appendChild(tooltip);
 
             wrapper.appendChild(descBox);

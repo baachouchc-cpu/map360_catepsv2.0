@@ -72,7 +72,9 @@ LEFT JOIN (
                'type', r.type_id,
                'type_name', c.name,
                'width_px', r.width_px,
-               'height_px', r.height_px
+               'height_px', r.height_px,
+               'api_key', r.api_key,
+               'update_api', r.update_api
              )
            ) AS interactions
     FROM interactions r

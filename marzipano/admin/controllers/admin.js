@@ -110,31 +110,52 @@ async function loadIcon() {
 
 // Función genérica para mostrar/ocultar campos y marcar como requeridos
 function toggleField({ show, required, targets }) {
+  
   targets.forEach(t => {
     const group = t.groupId ? document.getElementById(t.groupId) : null;
     const input = document.getElementById(t.inputId);
     const label = document.getElementById(t.labelId);
+    const small = t.hintId ? document.getElementById(t.hintId) : null;
+    const fieldRequired = t.required ?? required;
 
     if (group) group.style.display = show ? "block" : "none";
     else input.style.display = show ? "block" : "none";
 
+    // if (show && fieldRequired) input.required = true;
+    // else input.required = false;
+    input.required = show && fieldRequired;
+
     if (label) {
       label.style.display = show ? "block" : "none";
-      label.innerHTML = required
+      label.innerHTML = fieldRequired
         ? `${t.labelText}<span class="required">*</span>`
         : t.labelText;
     }
 
-    // ⚠️ SOLO marcar required si show = true
-    if (show && required) {
-      input.required = true;
+    if (small) {
+      if (show && t.hintText) {
+        small.style.display = "block";
+        small.textContent = t.hintText;
+      } else {
+        small.style.display = "none";
+        small.textContent = "";
+      }
     }
 
-    // ⚠️ SOLO limpiar si se oculta
-    if (!show) {
-      input.required = false;
-      input.value = "";
+    if (!show && input.type === "checkbox") {
+      input.checked = false;
     }
+
+    // // ⚠️ SOLO marcar required si show = true
+    // if (show && required) {
+    //   input.required = true;
+    // }
+
+    // // ⚠️ SOLO limpiar si se oculta
+    // if (!show) {
+    //   input.required = false;
+    //   input.value = "";
+    // }
   });
 }
 
@@ -179,20 +200,77 @@ function toggleFieldsByType() {
     }]
   });
   
-   //Foto
+  // 📺 APIs → tipo 3
+  toggleField({
+    show: typeValue == "3",
+    targets: [{
+      groupId: "group_api",
+      inputId: "api_key",
+      labelId: "lbl_api_key",
+      labelText: "API KEY",
+      required: true
+    },
+    {
+      groupId: "group_api",
+      inputId: "update_api",
+      labelId: "lbl_update_api",
+      labelText: "Mostrar fecha de actualización API",
+      required: false
+    }]
+  });
+
+  const isType1 = typeValue == "1";
+  const isType3 = typeValue == "3";
+  const isType2 = typeValue == "2";
+  // 🔗 LINK → tipos 2,3,4,6 obligatorio
   toggleField({
     show: true, // 👈 SIEMPRE visible
-    required: typeValue == "2" || typeValue == "4" || typeValue == "6",
+    required: typeValue == "2" || typeValue == "4" || typeValue == "6" || typeValue == "3",
     targets: [{
-      groupId: null,
+      groupId: "group_link",
       inputId: "link",
       labelId: "lbl_link",
-      labelText: "Link"
+      labelText: "Link",
+      hintId: "linkHint",
+      hintText: isType1
+      ? "Si quieres redirigir a una URL externa, introdúcela aquí. Ej: https://www.ejemplo.com"
+      : isType3
+      ? "La URL de la API no debe contener la clave (ej: https://api.ejemplo.com/data?param=1). La clave se introduce en el campo API KEY y se añade automáticamente."
+      : isType2
+      ? "La URL introducida debe ser embebidoo iframe (ej: https://www.youtube.com/embed/VIDEO_ID)"
+      : ""
+    }]
+  });
+
+  toggleField({
+    show: true, // 👈 SIEMPRE visible
+    required: typeValue == "3",
+    targets: [{
+      groupId: "group_description",
+      inputId: "description",
+      labelId: "lbl_description",
+      labelText: "Descripción (plantilla para API)",
+      hintId: "descriptionHint",
+      hintText: isType3
+      ?"Puedes usar etiquetas para mostrar datos de la API. Ejemplo: Clima: {weather[0].description}, Temperatura: {main.temp}°C"
+      :""
     }]
   });
 }
 
+// Mostrar/ocultar contraseña
+function toggleApiKey() {
+  const input = document.getElementById("api_key");
+  const eye = document.querySelector(".toggle-eye");
 
+  if (input.type === "password") {
+    input.type = "text";
+    eye.textContent = "🙈"; // opcional: cambia icono
+  } else {
+    input.type = "password";
+    eye.textContent = "👁";
+  }
+}
 
 /**
  * Rellenar formulario
@@ -212,6 +290,8 @@ function fillForm(data) {
   document.getElementById("width_px").value = data.width_px || "";
   document.getElementById("height_px").value = data.height_px || "";
   document.getElementById("password").value = "";
+  document.getElementById("api_key").value = data.api_key || "";
+  document.getElementById("update_api").checked = data.update_api || false ;
   toggleFieldsByType();
   if (data.pass_word) {
     document.getElementById("passwordHint").textContent =
@@ -239,7 +319,9 @@ async function saveInteraction(e) {
     type_id: document.getElementById("type_id").value,
     width_px: document.getElementById("width_px").value,
     height_px: document.getElementById("height_px").value,
-    pass_word: document.getElementById("password").value || null
+    pass_word: document.getElementById("password").value || null,
+    api_key: document.getElementById("api_key").value,
+    update_api: document.getElementById("update_api").checked || false,
   };
 
   const isEditMode = !!body.id_interactions;
@@ -254,7 +336,7 @@ async function saveInteraction(e) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body)
   });
-
+  console.log(body.update_api)
   if (res.ok) {
     //alert("Guardado correctamente");
     //window.location.href = "/admin";
